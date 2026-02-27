@@ -1,0 +1,1 @@
+C:\Programs\php-8.4.7-nts-Win32-vs17-x64\php.exe -S localhost:8008 index.php

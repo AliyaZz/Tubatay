@@ -1,0 +1,67 @@
+<?php
+session_start();
+require_once 'db.php'; ?>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+    <title>Главная</title>
+  </head>
+<body>
+  <div class="mainb">
+    <header class='header'>
+      <div class='header-inner'>
+        <div class="container p-lg-0">
+          <nav class="navbar navbar-expand-lg main-navbar">
+            <a class="navbar-brand" href="./index.php">Тюбетей</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon">
+                <i class="fas fa-bars" style="margin:5px 0px 0px 0px;"></i>
+              </span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                  <a class="nav-link" href="./menu.php">Меню</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="./index.php">Главная</a>
+                </li>
+                <li class="nav-item">
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <a class="nav-link" href="logout.php">Выйти</a>
+                    <?php else: ?>
+                        <a class="nav-link" href="./login.php">Войти</a>
+                    <?php endif; ?>
+                </li>
+              </ul>
+                <form class="d-flex">
+                  <input class="form-control me-2 search-form" type="search" placeholder="Поиск" aria-label="Search">
+                  <button class="btn btn-search" type="submit">Найти</button>
+                </form>
+                <a class="btn btn-primary" href="./cart.php" role="button">Корзина</a>
+              </div>
+          </nav>
+        </div>
+      </div> 
+    </header>
+
+    <div class="section-container-items">
+      <div class="container">
+        <div class="row align-items-center h-100" >
+          <div class="section col-md-6">
+            <h1>Тюбетей</h1>
+            <h3>Национальная татарская кухня</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src='main.js'></script>
+</body>
+</html>

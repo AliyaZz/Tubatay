@@ -99,69 +99,180 @@ function searchDishes(searchText) {
   
 
 document.addEventListener('DOMContentLoaded', function() {
-    const ratings = document.querySelectorAll('.rating');
-
-    ratings.forEach(rating => {
+    document.querySelectorAll('.rating').forEach(rating => {
         const stars = rating.querySelectorAll('.star');
+        const itemId = rating.dataset.productId;
         const currentRating = rating.parentElement.querySelector('.current-rating');
 
         stars.forEach(star => {
-            star.addEventListener('click', function() {
-                const value = parseInt(star.getAttribute('data-value'));
-                setRating(stars, value, currentRating);
+            star.addEventListener('click', async function() {
+                const value = parseInt(star.dataset.value);
+                
+                try {
+                    const response = await fetch('save_rating.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `item_id=${itemId}&rating=${value}`,
+                        credentials: 'include'
+                    });
+                    
+                    if (!response.ok) throw new Error('Войдите или зарегистрируйтесь');
+                    
+                    const data = await response.json();
+                    
+                    // Обновляем средний рейтинг
+                    currentRating.textContent = data.average.toFixed(1);
+                    
+                    // Подсвечиваем звезды пользователя
+                    stars.forEach(s => {
+                        s.classList.toggle('active', s.dataset.value <= value);
+                    });
+                    
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert(error);
+                }
             });
         });
     });
-
-    function setRating(stars, value, currentRatingElement) {
-        stars.forEach(star => {
-            const starValue = parseInt(star.getAttribute('data-value'));
-            if (starValue <= value) {
-                star.classList.add('active');
-            } else {
-                star.classList.remove('active');
-            }
-        });
-        currentRatingElement.textContent = value;
-    }
 });
 
+document.querySelectorAll('.card-btn').forEach(button => {
+  button.addEventListener('click', function(event) {
+    event.preventDefault();
+    addToCart(this);
+    const modal = new bootstrap.Modal(document.getElementById('cartModal'));
+    modal.show();
+  });
+});
 
-// menu.js
-
-function addToCart(button) {
-  // Находим родительский элемент карточки товара
+// Обновленная функция addToCart
+async function addToCart(button) {
+  const productId = button.getAttribute('data-item-id');
   const card = button.closest('.card');
-  
-  // Извлекаем данные о товаре
   const productName = card.querySelector('h4').innerText;
   const productPrice = card.querySelector('p').innerText;
   const productImage = card.querySelector('img').src;
-  const productId = card.querySelector('.rating').getAttribute('data-product-id');
 
-  // Создаем объект товара
   const product = {
-      id: productId,
-      name: productName,
-      price: productPrice,
-      image: productImage,
-      quantity: 1
+    id: productId,
+    name: productName,
+    price: productPrice,
+    image: productImage,
+    quantity: 1
   };
 
-  // Получаем текущую корзину из localStorage
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-  // Проверяем, есть ли уже такой товар в корзине
   const existingProduct = cart.find(item => item.id === productId);
+  
   if (existingProduct) {
-      existingProduct.quantity += 1; // Увеличиваем количество, если товар уже в корзине
+    existingProduct.quantity += 1;
   } else {
-      cart.push(product); // Добавляем новый товар в корзину
+    cart.push(product);
   }
 
-  // Сохраняем обновленную корзину в localStorage
   localStorage.setItem('cart', JSON.stringify(cart));
 
-  // // Опционально: можно показать уведомление о добавлении товара
-  // postMessage('Товар добавлен в корзину!');
+  // Синхронизация с БД для авторизованных пользователей
+  try {
+    const response = await fetch('add_to_cart.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ item_id: productId, quantity: 1 }),
+      credentials: 'include'
+    });
+
+    if (!response.ok) throw new Error('Ошибка при добавлении в корзину');
+  } catch (error) {
+    console.error('Ошибка:', error);
+    alert(error.message);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Удаление товара
+    document.querySelectorAll('.remove-item').forEach(button => {
+        button.addEventListener('click', async function() {
+            const itemId = this.dataset.itemId;
+            const confirmDelete = confirm('Вы уверены, что хотите удалить этот товар из корзины?');
+            
+            if (confirmDelete) {
+                try {
+                    const response = await fetch('remove_from_cart.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ item_id: itemId }),
+                        credentials: 'include'
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        const itemElement = document.querySelector(`[data-item-id="${itemId}"]`);
+                        itemElement.remove();
+                        await updateTotalPrice();
+                        alert('Товар удален');
+                    } else {
+                        showModal(data.error || 'Ошибка при удалении');
+                    }
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка');
+                }
+            }
+        });
+    });
+
+    // Очистка корзины
+    document.getElementById('clear-cart').addEventListener('click', async function() {
+        const confirmClear = confirm('Вы уверены, что хотите очистить корзину?');
+        if (confirmClear) {
+            try {
+                const response = await fetch('clear_cart.php', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('cart-items').innerHTML = '';
+                    await updateTotalPrice();
+                    alert('Корзина очищена');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Ошибка при очистке');
+            }
+        }
+    });
+});
+
+// Остальные функции без изменений
+
+// Обновленная функция для обновления общей суммы
+async function updateTotalPrice() {
+    try {
+        const response = await fetch('get_total.php');
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('total-price').textContent = 
+                parseFloat(data.total).toFixed(2);
+        }
+    } catch (error) {
+        console.error('Ошибка обновления суммы:', error);
+    }
+}
+
+// Функция для показа модального окна
+function showModal(message) {
+    const modal = new bootstrap.Modal(document.getElementById('cartDModal'));
+    const modalBody = document.querySelector('#cartDModal .modal-body');
+    modalBody.textContent = message;
+    modal.show();
 }
