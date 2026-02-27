@@ -1,0 +1,129 @@
+@font-face {
+    font-family: "Mulish-Regular";
+    font-style: normal;
+    font-weight: normal;
+    src: local("Mulish-Regular"), url("/fonts/Mulish-Regular.ttf") format("ttf");
+}
+@font-face {
+    font-family: "Mulish-Bold";
+    font-style: normal;
+    font-weight: normal;
+    src: local("Mulish-Bold"), url("/fonts/Mulish-Bold.ttf") format("ttf");
+}
+
+body{
+	font-family: 'Mulish-Regular';
+    background-position: top center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url("./media/back2.jpg");
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.header{
+    background: linear-gradient(black, rgba(0, 0, 0, 0));
+}
+
+.navbar-brand{
+    color: #FFFFFF;
+}
+
+.navbar-brand:hover{
+    color: #226554;
+}
+
+.nav-link{
+    color: #FFFFFF;
+}
+
+.nav-link:hover{
+    color: #226554;
+}
+
+.btn-primary{
+    margin-top: 15px;
+    background-color: #226554;
+    transition-duration: 0.2s;
+    border-color: #22655400;
+}
+
+.btn-primary:hover {
+    background-color: #FFFFFF;
+    border-color: #22655400;
+    color: #7a8884;
+}
+
+.btn-search{
+    margin-top: 15px;
+    background-color: #FFFFFF;
+    transition-duration: 0.2s;
+    border-color: #22655400;
+    color: #226554;
+}
+
+.btn-search:hover {
+    background-color: #226554;
+    border-color: #22655400;
+    color: #FFFFFF;
+}
+
+.me-2{
+    margin-top: 15px;
+}
+
+h1{
+    font-size: 68px;
+    font-weight: 600;
+    letter-spacing: -0.21px;
+    line-height: 90px;
+    color: #FFFFFF;
+}
+
+h3{
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: 0.30px;
+	padding: 0;
+    margin-top: 8px;
+    margin-left: 2px;
+    opacity: 0.7;
+    color: #FFFFFF;
+}
+
+.form-inline {
+    width: auto;
+}
+
+.form-control {
+    max-width: 300px;
+}
+
+.btn-primary {
+    margin-top: 15px;
+    margin-left: 10px;
+}
+
+.btn-primary {
+    margin-top: 15px;
+    margin-left: 10px;
+}
+
+.main-container{
+    background-color: #FFFFFF;
+}
+
+.mainb {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .section-container-items {
+    flex: 1;
+  }
